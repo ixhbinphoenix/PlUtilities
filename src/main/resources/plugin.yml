@@ -1,0 +1,17 @@
+main: io.github.ixhbinphoenix.Plutilties.Main
+version: 1.0.0
+api-version: 1.19
+name: PlUtilities
+commands:
+  tpa:
+    description: Ask a player to teleport to them
+    usage: /<command> <player>
+  tpahere:
+    description: Ask a player to teleport to you
+    usage: /<command> <player>
+  tpaccept:
+    description: Accept a teleport request
+    usage: /<command> <player>
+  tpcancel:
+    description: Cancels an outgoin TP Request
+    usage: /<command> <player>
