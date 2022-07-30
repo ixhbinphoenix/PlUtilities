@@ -1,6 +1,7 @@
 package io.github.ixhbinphoenix.Plutilties
 
 import io.github.ixhbinphoenix.Plutilties.commands.*
+import io.github.ixhbinphoenix.Plutilties.events.Events
 import io.github.ixhbinphoenix.Plutilties.tpa.TpaManager
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -25,6 +26,7 @@ class Main : JavaPlugin() {
         getCommand(cmd.key)?.setExecutor(cmd.value)
         getCommand(cmd.key)?.tabCompleter = cmd.value
     }
+    server.pluginManager.registerEvents(Events(), this)
 
     server.consoleSender.sendMessage(Component.text("Plutilities enabled!").color(NamedTextColor.GREEN))
   }

@@ -1,12 +1,20 @@
 package io.github.ixhbinphoenix.Plutilties.tpa
 
+import io.github.ixhbinphoenix.Plutilties.cooldown.TpaWaitRunnable
+import io.github.ixhbinphoenix.Plutilties.getInstance
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 
 class TpaManager {
   val requests = ArrayList<TpRequest>()
+  val timers = HashMap<TpRequest, BukkitTask>()
+
+  fun getOutgoingRunningRequests(sender: Player): List<TpRequest> {
+    return requests.filter { req -> req.sender == sender && timers.containsKey(req) }
+  }
 
   fun sendTPA(sender: Player, receiver: Player) {
     val request = TpRequest(sender, receiver, false)
@@ -55,6 +63,8 @@ class TpaManager {
 
   fun cancelTPA(request: TpRequest) {
     requests.remove(request)
+    timers[request]!!.cancel()
+    timers.remove(request)
     if (request.sender.isOnline) {
       request.sender.sendMessage(Component.text("You've cancelled your TP request to ").color(NamedTextColor.GOLD)
         .append(Component.text(request.receiver.name).color(NamedTextColor.YELLOW)))
@@ -66,6 +76,20 @@ class TpaManager {
   }
 
   fun acceptTPA(request: TpRequest) {
+    if (request.receiver.isOnline) {
+      request.receiver.sendMessage(Component.text("Accepted TPA, please stand still for 5 seconds.").color(NamedTextColor.GOLD))
+      val plugin = getInstance()
+      timers[request] = TpaWaitRunnable(request).runTaskLater(plugin, 100)
+    } else {
+      request.sender.sendMessage(
+        Component.text(request.receiver.name).color(NamedTextColor.YELLOW)
+          .append(Component.text(" is no longer online!").color(NamedTextColor.RED))
+      )
+    }
+  }
+
+  fun runTPA(request: TpRequest) {
+    timers.remove(request)
     requests.remove(request)
     if (request.sender.isOnline) {
       if (request.toSender) {
@@ -84,6 +108,19 @@ class TpaManager {
     } else {
       request.receiver.sendMessage(Component.text(request.sender.name).color(NamedTextColor.YELLOW)
         .append(Component.text(" is no longer online!").color(NamedTextColor.RED)))
+    }
+  }
+
+  fun abortTPA(request: TpRequest) {
+    requests.remove(request)
+    timers[request]!!.cancel()
+    timers.remove(request)
+    if (request.sender.isOnline) {
+      request.sender.sendMessage(Component.text("You've moved! Your TP Request was aborted.").color(NamedTextColor.RED))
+    }
+    if (request.receiver.isOnline) {
+      request.receiver.sendMessage(Component.text(request.sender.name).color(NamedTextColor.YELLOW)
+        .append(Component.text(" has moved and has therefore aborted the TP Request.").color(NamedTextColor.RED)))
     }
   }
 }

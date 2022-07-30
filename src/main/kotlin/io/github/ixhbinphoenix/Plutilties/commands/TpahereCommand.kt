@@ -15,12 +15,11 @@ class TpahereCommand : BaseCommand {
       if (args.isNotEmpty()) {
         val player = plugin.server.getPlayer(args[0])
         if (player is Player) {
-          plugin.tpaManager.sendTPA(sender, player)
+          plugin.tpaManager.sendTPAHere(sender, player)
         } else {
           sender.sendMessage(
             Component.text(args[0]).color(NamedTextColor.YELLOW).append(
-              Component.text(" is not an online player!").color(
-                NamedTextColor.RED)))
+              Component.text(" is not an online player!").color(NamedTextColor.RED)))
         }
       } else {
         sender.sendMessage(Component.text("Not enough arguments! Usage: /tpahere <player>").color(NamedTextColor.RED))
