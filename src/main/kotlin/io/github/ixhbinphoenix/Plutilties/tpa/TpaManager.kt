@@ -12,8 +12,8 @@ class TpaManager {
   val requests = ArrayList<TpRequest>()
   val timers = HashMap<TpRequest, BukkitTask>()
 
-  fun getOutgoingRunningRequests(sender: Player): List<TpRequest> {
-    return requests.filter { req -> req.sender == sender && timers.containsKey(req) }
+  fun getRunningRequests(sender: Player): List<TpRequest> {
+    return requests.filter { req -> (req.sender == sender || req.receiver == sender) && timers.containsKey(req) }
   }
 
   fun sendTPA(sender: Player, receiver: Player) {
@@ -76,15 +76,23 @@ class TpaManager {
   }
 
   fun acceptTPA(request: TpRequest) {
-    if (request.receiver.isOnline) {
+    if (!request.toSender) {
+      if (request.receiver.isOnline) {
+        request.receiver.sendMessage(Component.text("Accepted TPA, please stand still for 5 seconds.").color(NamedTextColor.GOLD))
+        request.sender.sendMessage(Component.text(request.receiver.name).color(NamedTextColor.YELLOW).append(Component.text(" accepted your TPA, please stand still for 5 seconds").color(NamedTextColor.GOLD)))
+        val plugin = getInstance()
+        timers[request] = TpaWaitRunnable(request).runTaskLater(plugin, 100)
+      } else {
+        request.sender.sendMessage(
+          Component.text(request.receiver.name).color(NamedTextColor.YELLOW)
+            .append(Component.text(" is no longer online!").color(NamedTextColor.RED))
+        )
+      }
+    } else {
       request.receiver.sendMessage(Component.text("Accepted TPA, please stand still for 5 seconds.").color(NamedTextColor.GOLD))
+      request.sender.sendMessage(Component.text(request.receiver.name).color(NamedTextColor.YELLOW).append(Component.text(" accepted your TPA, please stand still for 5 seconds").color(NamedTextColor.GOLD)))
       val plugin = getInstance()
       timers[request] = TpaWaitRunnable(request).runTaskLater(plugin, 100)
-    } else {
-      request.sender.sendMessage(
-        Component.text(request.receiver.name).color(NamedTextColor.YELLOW)
-          .append(Component.text(" is no longer online!").color(NamedTextColor.RED))
-      )
     }
   }
 
@@ -116,11 +124,10 @@ class TpaManager {
     timers[request]!!.cancel()
     timers.remove(request)
     if (request.sender.isOnline) {
-      request.sender.sendMessage(Component.text("You've moved! Your TP Request was aborted.").color(NamedTextColor.RED))
+      request.sender.sendMessage(Component.text("One of you has moved. The TP Request was cancelled.").color(NamedTextColor.RED))
     }
     if (request.receiver.isOnline) {
-      request.receiver.sendMessage(Component.text(request.sender.name).color(NamedTextColor.YELLOW)
-        .append(Component.text(" has moved and has therefore aborted the TP Request.").color(NamedTextColor.RED)))
+      request.receiver.sendMessage(Component.text("One of you has moved. The TP Request was cancelled.").color(NamedTextColor.RED))
     }
   }
 }
