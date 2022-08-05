@@ -11,10 +11,12 @@ class Events : Listener {
 
   @EventHandler
   fun onPlayerMove(event: PlayerMoveEvent) {
-    val reqs = plugin.tpaManager.getRunningRequests(event.player)
-    if (reqs.isNotEmpty()) {
-      for (req in reqs) {
-        plugin.tpaManager.abortTPA(req)
+    if (event.hasChangedPosition()) {
+      val reqs = plugin.tpaManager.getRunningRequests(event.player)
+      if (reqs.isNotEmpty()) {
+        for (req in reqs) {
+          plugin.tpaManager.abortTPA(req)
+        }
       }
     }
   }

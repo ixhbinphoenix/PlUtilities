@@ -25,7 +25,7 @@ class TpaManager {
       )
       receiver.sendMessage(
         Component.text(sender.name).color(NamedTextColor.YELLOW)
-          .append(Component.text(" wants you to teleport to them!").color(NamedTextColor.GOLD))
+          .append(Component.text(" wants to teleport to you!").color(NamedTextColor.GOLD))
           .append(Component.text("\nYou can accept using ").color(NamedTextColor.GOLD)
               .append(Component.text("/tpaccept ${sender.name}").color(NamedTextColor.YELLOW).clickEvent(ClickEvent.runCommand("/tpaccept ${sender.name}"))))
       )
