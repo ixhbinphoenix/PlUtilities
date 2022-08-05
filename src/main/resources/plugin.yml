@@ -13,5 +13,12 @@ commands:
     description: Accept a teleport request
     usage: /<command> <player>
   tpcancel:
-    description: Cancels an outgoin TP Request
+    description: Cancels an outgoing TP Request
     usage: /<command> <player>
+  setspawn:
+    description: Sets the world spawn
+    usage: /<command>
+    permission: plutilties.spawn.set
+  spawn:
+    description: Warps to the world spawn
+    usage: /<command>
